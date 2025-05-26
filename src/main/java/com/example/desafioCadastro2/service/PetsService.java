@@ -1,22 +1,31 @@
 package com.example.desafioCadastro2.service;
 
+import com.example.desafioCadastro2.controllers.PetsControllers;
 import com.example.desafioCadastro2.dtos.PetsRecordsDto;
+import com.example.desafioCadastro2.models.Constantes;
 import com.example.desafioCadastro2.models.Sexo;
 import com.example.desafioCadastro2.models.Tipo;
+import org.springframework.stereotype.Service;
 
 import java.util.Scanner;
 
+@Service
 public class PetsService {
+    private final PetsControllers petsControllers;
     private static final Scanner SCANNER = new Scanner(System.in);
 
-    public static void cadastroPetMenu() {
+    public PetsService(PetsControllers petsControllers) {
+        this.petsControllers = petsControllers;
+    }
+
+    public void cadastroPetMenu() {
         System.out.println("1. Qual o nome e Sobrenome do pet?");
         String name = SCANNER.nextLine();
-        if (!name.matches("^[A-Za-zÀ-ÖØ-öø-ÿ]+( [A-Za-zÀ-ÖØ-öø-ÿ]+)+$")){
-            throw new IllegalArgumentException("Nome Inválido! Deve conter apenas letras");
+        if (name.isEmpty()) {
+            name = Constantes.NAO_INFORMADO;
         }
-        if (!hasLastName(name)) {
-            throw new IllegalArgumentException("O pet deve ter um sobrenome!");
+        else if (!name.matches("^[A-Za-zÀ-ÖØ-öø-ÿ]+( [A-Za-zÀ-ÖØ-öø-ÿ]+)+$")) {
+            throw new IllegalArgumentException("Nome Inválido! Deve conter Sobrenome e apenas letras");
         }
 
         Tipo tipo = null;
@@ -42,7 +51,14 @@ public class PetsService {
         System.out.println("4. Qual endereço e bairro que ele foi encontrado?");
 
         System.out.println("Qual o número da casa?");
-        int numCasa = Integer.parseInt(SCANNER.nextLine());
+        String input = SCANNER.nextLine().trim();
+
+        int numCasa;
+        if (input.isEmpty()) {
+            numCasa = Constantes.INT_NAO_INFORMADO; // Ex: 0 ou -1
+        } else {
+            numCasa = Integer.parseInt(input);
+        }
 
         System.out.println("Qual a cidade?");
         String cidade = SCANNER.nextLine();
@@ -53,23 +69,45 @@ public class PetsService {
         String endereco = "Rua " + rua + ", " + numCasa + ", " + cidade;
 
         System.out.println("5. Qual a idade aproximada do pet?");
-        float idade = Float.parseFloat(SCANNER.nextLine().replace(",","."));
+        String inputIdade = SCANNER.nextLine().trim();
 
+        float idade;
+        if (inputIdade.isEmpty()) {
+            idade = Constantes.FLOAT_NAO_INFORMADO; // exemplo: 0.0f
+        } else {
+            idade = Float.parseFloat(inputIdade.replace(",", "."));
+
+            if (idade > 60 || idade < 0) {
+                throw new IllegalArgumentException("Idade Inválida!");
+            }
+            if (idade < 12) {
+                idade = idade / 12f;
+            }
+        }
         System.out.println("6. Qual o peso aproximado do pet?");
-        float peso = Float.parseFloat(SCANNER.nextLine().replace(",","."));
+        String inputPeso = SCANNER.nextLine().trim();
+        float peso;
+        if (inputPeso.isEmpty()) {
+            peso = Constantes.FLOAT_NAO_INFORMADO; // ex: 0.0f
+        }
+        else {
+            peso = Float.parseFloat(inputPeso.replace(",", "."));
+            if (peso > 60 || peso < 0.5) {
+                throw new IllegalArgumentException("Peso Inválido!");
+            }
+        }
 
         System.out.println("7. Qual a raça do pet?");
         String raca = SCANNER.nextLine();
+        if (raca.isEmpty()) {
+            raca = Constantes.NAO_INFORMADO;
+        }
+        if (!raca.matches("^[A-Za-zÀ-ÖØ-öø-ÿ]+( [A-Za-zÀ-ÖØ-öø-ÿ]+)+$")) {
+            throw new IllegalArgumentException("Raça Inválida! Deve conter apenas letras");
+        }
 
         PetsRecordsDto dto = new PetsRecordsDto(name, tipo, sexo, endereco, idade, peso, raca);
+        this.petsControllers.savePets(dto);
         System.out.println("Pet cadastrado com sucesso!");
-    }
-
-    private static boolean hasLastName(String name) {
-        String[] nameAndLastName = name.trim().split(" ");
-        if (nameAndLastName.length >= 2) {
-            return true;
-        }
-        return false;
     }
 }

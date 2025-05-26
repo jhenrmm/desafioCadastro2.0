@@ -11,6 +11,12 @@ import java.util.Scanner;
 @SpringBootApplication
 public class DesafioCadastro2Application implements CommandLineRunner {
 	private static final Scanner SCANNER = new Scanner(System.in);
+	PetsService petsService;
+
+	public DesafioCadastro2Application(PetsService  petsService){
+		this.petsService= petsService;
+	}
+
 	public static void main(String[] args) {
 		SpringApplication.run(DesafioCadastro2Application.class, args);
 	}
@@ -25,15 +31,16 @@ public class DesafioCadastro2Application implements CommandLineRunner {
 			op = Integer.parseInt(SCANNER.nextLine());
 			if (op <= 0 || op > 6) {
 				System.out.println("Opção Inválida!");
+				continue;
 			}
 			if (op == 6) break;
 			switch (op){
-				case 1 -> {
-					PetsService.cadastroPetMenu();
-				}
+				case 1 -> petsService.cadastroPetMenu();
+
 				default -> isTrue = false;
 			}
 		}
+		System.exit(0);
 
 	}
 	private static void menu(){
