@@ -61,7 +61,7 @@ public class PetsModel implements Serializable {
         this.endereco = endereco;
     }
 
-    public float getIdade() {
+    public Float getIdade() {
         return idade;
     }
 
@@ -69,7 +69,7 @@ public class PetsModel implements Serializable {
         this.idade = idade;
     }
 
-    public float getPeso() {
+    public Float getPeso() {
         return peso;
     }
 
@@ -83,5 +83,19 @@ public class PetsModel implements Serializable {
 
     public void setRaca(String raca) {
         this.raca = raca;
+    }
+
+    @Override
+    public String toString() {
+        return "PetsModel{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", tipo=" + tipo +
+                ", sexo=" + sexo +
+                ", endereco='" + endereco + '\'' +
+                ", idade=" + idade +
+                ", peso=" + peso +
+                ", raca='" + raca + '\'' +
+                '}';
     }
 }

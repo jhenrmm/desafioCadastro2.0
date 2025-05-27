@@ -1,15 +1,21 @@
 package com.example.desafioCadastro2.service;
 
 import com.example.desafioCadastro2.controllers.PetsControllers;
+import com.example.desafioCadastro2.dtos.FiltrarPetsDto;
 import com.example.desafioCadastro2.dtos.PetsRecordsDto;
 import com.example.desafioCadastro2.models.Constantes;
+import com.example.desafioCadastro2.models.PetsModel;
 import com.example.desafioCadastro2.models.Sexo;
 import com.example.desafioCadastro2.models.Tipo;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Scanner;
 
 @Service
+@Log4j2
 public class PetsService {
     private final PetsControllers petsControllers;
     private static final Scanner SCANNER = new Scanner(System.in);
@@ -110,4 +116,82 @@ public class PetsService {
         this.petsControllers.savePets(dto);
         System.out.println("Pet cadastrado com sucesso!");
     }
+
+    public void alterarPetMenu() {
+        System.out.println("Qual o tipo do animal?");
+        System.out.println("1. Cachorro");
+        System.out.println("2. Gato");
+        int tipoAnimal = Integer.parseInt(SCANNER.nextLine());
+        if (tipoAnimal > 2 || tipoAnimal < 1){
+            throw new IllegalArgumentException("Tipo Inválido!");
+        }
+        Tipo tipo = (tipoAnimal == 1) ? Tipo.CACHORRO : Tipo.GATO;
+
+        FiltrarPetsDto filtro = new FiltrarPetsDto();
+
+        mostrarOpcoesDeCriterios();
+        int criterio1 = Integer.parseInt(SCANNER.nextLine());
+        preencherCriterio(criterio1, filtro);
+
+        System.out.println("Deseja utilizar mais um critério? (S/N)");
+        String criterioOpcional = SCANNER.nextLine().trim().toUpperCase();
+
+        if (criterioOpcional.equals("S")) {
+            mostrarOpcoesDeCriterios();
+            int criterio2 = Integer.parseInt(SCANNER.nextLine());
+            preencherCriterio(criterio2, filtro);
+        }
+        ResponseEntity<List<PetsModel>> listResponseEntity = this.petsControllers.buscarPetsCriterio(tipo, filtro.nome, filtro.sexo, filtro.idade, filtro.peso, filtro.raca, filtro.endereco);
+        listResponseEntity.getBody();
+    }
+    public void mostrarOpcoesDeCriterios(){
+        System.out.println("Deseja procurar por qual critério?");
+        System.out.println("1. Nome ou Sobrenome");
+        System.out.println("2. Sexo");
+        System.out.println("3. Idade");
+        System.out.println("4. Peso");
+        System.out.println("5. Raça");
+        System.out.println("6. Endereço");
+    }
+    public void preencherCriterio(int criterio, FiltrarPetsDto filtro){
+        switch (criterio){
+            case 1 -> {
+                System.out.println("Digite o nome ou sobrenome: ");
+                filtro.nome = SCANNER.nextLine();
+            }
+            case 2 -> {
+                System.out.println("Digite o Sexo: ");
+                filtro.sexo = SCANNER.nextLine().trim().toUpperCase();
+            }
+            case 3 -> {
+                System.out.println("Digite a Idade: ");
+                filtro.idade  = Float.parseFloat(SCANNER.nextLine());
+            }
+            case 4 -> {
+                System.out.println("Digite o Peso: ");
+                filtro.peso = Float.parseFloat(SCANNER.nextLine());
+            }
+            case 5 -> {
+                System.out.println("Digite a Raça: ");
+                filtro.raca = SCANNER.nextLine();
+            }
+            case 6 -> {
+                System.out.println("Digite o Endereço: ");
+                filtro.endereco = SCANNER.nextLine();
+            }
+            default -> throw new IllegalArgumentException("Critério Inválido!");
+
+        }
+    }
+
+    public void deletarPetCadastrado(){
+
+    }
+    public void listaPetsCadastrados(){
+
+    }
+    public void listarPetsPorCriterio(){
+
+    }
+
 }

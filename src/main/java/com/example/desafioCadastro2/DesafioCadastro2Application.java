@@ -36,7 +36,7 @@ public class DesafioCadastro2Application implements CommandLineRunner {
 			if (op == 6) break;
 			switch (op){
 				case 1 -> petsService.cadastroPetMenu();
-
+				case 2 -> petsService.alterarPetMenu();
 				default -> isTrue = false;
 			}
 		}
