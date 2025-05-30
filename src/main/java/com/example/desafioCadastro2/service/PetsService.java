@@ -118,31 +118,7 @@ public class PetsService {
     }
 
     public void alterarPetMenu() {
-        System.out.println("Qual o tipo do animal?");
-        System.out.println("1. Cachorro");
-        System.out.println("2. Gato");
-        int tipoAnimal = Integer.parseInt(SCANNER.nextLine());
-        if (tipoAnimal > 2 || tipoAnimal < 1){
-            throw new IllegalArgumentException("Tipo Inválido!");
-        }
-        Tipo tipo = (tipoAnimal == 1) ? Tipo.CACHORRO : Tipo.GATO;
-
-        FiltrarPetsDto filtro = new FiltrarPetsDto();
-
-        mostrarOpcoesDeCriterios();
-        int criterio1 = Integer.parseInt(SCANNER.nextLine());
-        preencherCriterio(criterio1, filtro);
-
-        System.out.println("Deseja utilizar mais um critério? (S/N)");
-        String criterioOpcional = SCANNER.nextLine().trim().toUpperCase();
-
-        if (criterioOpcional.equals("S")) {
-            mostrarOpcoesDeCriterios();
-            int criterio2 = Integer.parseInt(SCANNER.nextLine());
-            preencherCriterio(criterio2, filtro);
-        }
-        ResponseEntity<List<PetsModel>> listResponseEntity = this.petsControllers.buscarPetsCriterio(tipo, filtro.nome, filtro.sexo, filtro.idade, filtro.peso, filtro.raca, filtro.endereco);
-        List<PetsModel> listaDePets = listResponseEntity.getBody();
+        List<PetsModel> listaDePets = buscarPetsComCriterios("atualizar");
 
         if (listaDePets == null || listaDePets.isEmpty()) {
             System.out.println("Nenhum pet encontrado com os critérios informados.");
@@ -180,31 +156,7 @@ public class PetsService {
     }
 
     public void deletarPet(){
-        System.out.println("Qual o tipo do animal?");
-        System.out.println("1. Cachorro");
-        System.out.println("2. Gato");
-        int tipoAnimal = Integer.parseInt(SCANNER.nextLine());
-        if (tipoAnimal > 2 || tipoAnimal < 1){
-            throw new IllegalArgumentException("Tipo Inválido!");
-        }
-        Tipo tipo = (tipoAnimal == 1) ? Tipo.CACHORRO : Tipo.GATO;
-
-        FiltrarPetsDto filtro = new FiltrarPetsDto();
-
-        mostrarOpcoesDeCriterios();
-        int criterio1 = Integer.parseInt(SCANNER.nextLine());
-        preencherCriterio(criterio1, filtro);
-
-        System.out.println("Deseja utilizar mais um critério? (S/N)");
-        String criterioOpcional = SCANNER.nextLine().trim().toUpperCase();
-
-        if (criterioOpcional.equals("S")) {
-            mostrarOpcoesDeCriterios();
-            int criterio2 = Integer.parseInt(SCANNER.nextLine());
-            preencherCriterio(criterio2, filtro);
-        }
-        ResponseEntity<List<PetsModel>> listResponseEntity = this.petsControllers.buscarPetsCriterio(tipo, filtro.nome, filtro.sexo, filtro.idade, filtro.peso, filtro.raca, filtro.endereco);
-        List<PetsModel> listaDePets = listResponseEntity.getBody();
+        List<PetsModel> listaDePets = buscarPetsComCriterios("deletar");
 
         if (listaDePets == null || listaDePets.isEmpty()) {
             System.out.println("Nenhum pet encontrado com os critérios informados.");
@@ -294,31 +246,7 @@ public class PetsService {
         }
     }
     public void listarPetsPorCriterio(){
-        System.out.println("Qual o tipo do animal?");
-        System.out.println("1. Cachorro");
-        System.out.println("2. Gato");
-        int tipoAnimal = Integer.parseInt(SCANNER.nextLine());
-        if (tipoAnimal > 2 || tipoAnimal < 1){
-            throw new IllegalArgumentException("Tipo Inválido!");
-        }
-        Tipo tipo = (tipoAnimal == 1) ? Tipo.CACHORRO : Tipo.GATO;
-
-        FiltrarPetsDto filtro = new FiltrarPetsDto();
-
-        mostrarOpcoesDeCriterios();
-        int criterio1 = Integer.parseInt(SCANNER.nextLine());
-        preencherCriterio(criterio1, filtro);
-
-        System.out.println("Deseja utilizar mais um critério? (S/N)");
-        String criterioOpcional = SCANNER.nextLine().trim().toUpperCase();
-
-        if (criterioOpcional.equals("S")) {
-            mostrarOpcoesDeCriterios();
-            int criterio2 = Integer.parseInt(SCANNER.nextLine());
-            preencherCriterio(criterio2, filtro);
-        }
-        ResponseEntity<List<PetsModel>> listResponseEntity = this.petsControllers.buscarPetsCriterio(tipo, filtro.nome, filtro.sexo, filtro.idade, filtro.peso, filtro.raca, filtro.endereco);
-        List<PetsModel> listaDePets = listResponseEntity.getBody();
+        List<PetsModel> listaDePets = buscarPetsComCriterios("listar");
 
         if (listaDePets == null || listaDePets.isEmpty()) {
             System.out.println("Nenhum pet encontrado com os critérios informados.");
@@ -365,6 +293,26 @@ public class PetsService {
         }
 
         return new PetsRecordsDto(name, pet.getTipo(), pet.getSexo(), endereco, idade, peso, raca);
+    }
+    private List<PetsModel> buscarPetsComCriterios(String acao) {
+        System.out.printf("Qual o tipo do animal para %s?%n", acao);
+        System.out.println("1. Cachorro");
+        System.out.println("2. Gato");
+        int tipoAnimal = Integer.parseInt(SCANNER.nextLine());
+        if (tipoAnimal < 1 || tipoAnimal > 2) throw new IllegalArgumentException("Tipo Inválido!");
+        Tipo tipo = (tipoAnimal == 1) ? Tipo.CACHORRO : Tipo.GATO;
+
+        FiltrarPetsDto filtro = new FiltrarPetsDto();
+        mostrarOpcoesDeCriterios();
+        preencherCriterio(Integer.parseInt(SCANNER.nextLine()), filtro);
+
+        System.out.println("Deseja utilizar mais um critério? (S/N)");
+        if (SCANNER.nextLine().trim().equalsIgnoreCase("S")) {
+            mostrarOpcoesDeCriterios();
+            preencherCriterio(Integer.parseInt(SCANNER.nextLine()), filtro);
+        }
+
+        return petsControllers.buscarPetsCriterio(tipo, filtro.nome, filtro.sexo, filtro.idade, filtro.peso, filtro.raca, filtro.endereco).getBody();
     }
 
 
