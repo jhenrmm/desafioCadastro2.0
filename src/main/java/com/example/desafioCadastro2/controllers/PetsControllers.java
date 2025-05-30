@@ -55,9 +55,6 @@ public class PetsControllers {
             @RequestParam(required = false) String endereco
     ) {
         List<PetsModel> pets = buscarPets(tipo, nome, sexo, idade, peso, raca, endereco);
-        for (int i = 0; i < pets.size(); i++) {
-            System.out.println(i + ". " + pets.get(i).toString());
-        }
         return ResponseEntity.status(HttpStatus.OK).body(pets);
     }
 

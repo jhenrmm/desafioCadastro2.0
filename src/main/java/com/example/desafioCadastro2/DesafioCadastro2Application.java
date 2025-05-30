@@ -37,6 +37,9 @@ public class DesafioCadastro2Application implements CommandLineRunner {
 			switch (op){
 				case 1 -> petsService.cadastroPetMenu();
 				case 2 -> petsService.alterarPetMenu();
+				case 3 -> petsService.deletarPet();
+				case 4 -> petsService.listaPetsCadastrados();
+				case 5 -> petsService.listarPetsPorCriterio();
 				default -> isTrue = false;
 			}
 		}
