@@ -11,7 +11,6 @@ import com.example.desafioCadastro2.repositories.PetsRepository;
 import com.example.desafioCadastro2.validations.ValidacaoException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.BeanUtils;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
