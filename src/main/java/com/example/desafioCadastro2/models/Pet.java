@@ -4,15 +4,19 @@ package com.example.desafioCadastro2.models;
 import com.example.desafioCadastro2.dtos.PetDto;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
-import java.util.UUID;
+import java.util.Objects;
 
 @Getter
+@Setter
 @Entity
 @Table(name = "PETS_CADASTRADOS")
 public class Pet implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -27,9 +31,9 @@ public class Pet implements Serializable {
 
     private String endereco;
 
-    private float idade;
+    private Float idade;
 
-    private float peso;
+    private Float peso;
 
     private String raca;
 
@@ -43,46 +47,6 @@ public class Pet implements Serializable {
         this.idade = dto.idade();
         this.peso = dto.peso();
         this.raca = dto.raca();
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setTipo(Tipo tipo) {
-        this.tipo = tipo;
-    }
-
-    public void setSexo(Sexo sexo) {
-        this.sexo = sexo;
-    }
-
-    public void setEndereco(String endereco) {
-        this.endereco = endereco;
-    }
-
-    public Float getIdade() {
-        return idade;
-    }
-
-    public void setIdade(float idade) {
-        this.idade = idade;
-    }
-
-    public Float getPeso() {
-        return peso;
-    }
-
-    public void setPeso(float peso) {
-        this.peso = peso;
-    }
-
-    public void setRaca(String raca) {
-        this.raca = raca;
     }
 
     @Override
