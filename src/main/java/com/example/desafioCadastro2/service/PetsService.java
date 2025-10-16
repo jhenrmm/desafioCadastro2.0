@@ -2,23 +2,29 @@ package com.example.desafioCadastro2.service;
 
 import com.example.desafioCadastro2.controllers.PetsControllers;
 import com.example.desafioCadastro2.dtos.FiltrarPetsDto;
-import com.example.desafioCadastro2.dtos.PetsRecordsDto;
+import com.example.desafioCadastro2.dtos.PetDto;
 import com.example.desafioCadastro2.models.Constantes;
-import com.example.desafioCadastro2.models.PetsModel;
+import com.example.desafioCadastro2.models.Pet;
 import com.example.desafioCadastro2.models.Sexo;
 import com.example.desafioCadastro2.models.Tipo;
+import com.example.desafioCadastro2.repositories.PetsRepository;
+import com.example.desafioCadastro2.validations.ValidacaoException;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.BeanUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 @Service
 @Log4j2
 public class PetsService {
     private final PetsControllers petsControllers;
     private static final Scanner SCANNER = new Scanner(System.in);
+    private PetsRepository petsRepository;
 
     public PetsService(PetsControllers petsControllers) {
         this.petsControllers = petsControllers;
@@ -112,32 +118,20 @@ public class PetsService {
             throw new IllegalArgumentException("Raça Inválida! Deve conter apenas letras");
         }
 
-        PetsRecordsDto dto = new PetsRecordsDto(name, tipo, sexo, endereco, idade, peso, raca);
+        PetDto dto = new PetDto(name, tipo, sexo, endereco, idade, peso, raca);
         this.petsControllers.savePets(dto);
         System.out.println("Pet cadastrado com sucesso!");
     }
 
     public void alterarPetMenu() {
-        List<PetsModel> listaDePets = buscarPetsComCriterios("atualizar");
+        List<Pet> listaDePets = buscarPetsComCriterios("atualizar");
 
         if (listaDePets == null || listaDePets.isEmpty()) {
             System.out.println("Nenhum pet encontrado com os critérios informados.");
             return;
         }
 
-        for (int i = 0; i < listaDePets.size(); i++) {
-            PetsModel pet = listaDePets.get(i);
-            System.out.printf("%d. Nome: %s | Tipo: %s | Sexo: %s | Idade: %.1f | Peso: %.1f | Raça: %s | Endereço: %s%n",
-                    i + 1,
-                    pet.getName(),
-                    pet.getTipo(),
-                    pet.getSexo(),
-                    pet.getIdade(),
-                    pet.getPeso(),
-                    pet.getRaca(),
-                    pet.getEndereco()
-            );
-        }
+        listarPetsIterando(listaDePets);
 
         System.out.println("Digite o número do pet que deseja alterar:");
         int escolha = Integer.parseInt(SCANNER.nextLine());
@@ -147,35 +141,23 @@ public class PetsService {
             return;
         }
 
-        PetsModel petEscolhido = listaDePets.get(escolha - 1);
+        Pet petEscolhido = listaDePets.get(escolha - 1);
 
-        PetsRecordsDto petsRecordsDto =  obterNovosDadosDoPet(petEscolhido);
-        this.petsControllers.updatePetById(petEscolhido.getId(), petsRecordsDto);
+        PetDto petDto =  obterNovosDadosDoPet(petEscolhido);
+        this.petsControllers.updatePetById(petEscolhido.getId(), petDto);
         System.out.println("Pet alterado com sucesso!");
 
     }
 
     public void deletarPet(){
-        List<PetsModel> listaDePets = buscarPetsComCriterios("deletar");
+        List<Pet> listaDePets = buscarPetsComCriterios("deletar");
 
         if (listaDePets == null || listaDePets.isEmpty()) {
             System.out.println("Nenhum pet encontrado com os critérios informados.");
             return;
         }
 
-        for (int i = 0; i < listaDePets.size(); i++) {
-            PetsModel pet = listaDePets.get(i);
-            System.out.printf("%d. Nome: %s | Tipo: %s | Sexo: %s | Idade: %.1f | Peso: %.1f | Raça: %s | Endereço: %s%n",
-                    i + 1,
-                    pet.getName(),
-                    pet.getTipo(),
-                    pet.getSexo(),
-                    pet.getIdade(),
-                    pet.getPeso(),
-                    pet.getRaca(),
-                    pet.getEndereco()
-            );
-        }
+        listarPetsIterando(listaDePets);
 
         System.out.println("Digite o número do pet que deseja deletar:");
         int escolha = Integer.parseInt(SCANNER.nextLine());
@@ -185,7 +167,7 @@ public class PetsService {
             return;
         }
 
-        PetsModel petEscolhido = listaDePets.get(escolha - 1);
+        Pet petEscolhido = listaDePets.get(escolha - 1);
         petsControllers.deletePet(petEscolhido.getId());
         System.out.println("Pet deletado com sucesso!");
     }
@@ -231,41 +213,22 @@ public class PetsService {
     }
 
     public void listaPetsCadastrados(){
-        ResponseEntity<List<PetsModel>> allPets = petsControllers.getAllPets();
-        List<PetsModel> pets = allPets.getBody();
-        for (PetsModel pet : pets){
-            System.out.printf("Nome: %s | Tipo: %s | Sexo: %s | Idade: %.1f | Peso: %.1f | Raça: %s | Endereço: %s%n",
-                    pet.getName(),
-                    pet.getTipo(),
-                    pet.getSexo(),
-                    pet.getIdade(),
-                    pet.getPeso(),
-                    pet.getRaca(),
-                    pet.getEndereco()
-            );
-        }
+        List<Pet> pets = listarTodosPets();
+        listarPets(pets);
     }
+
     public void listarPetsPorCriterio(){
-        List<PetsModel> listaDePets = buscarPetsComCriterios("listar");
+        List<Pet> listaDePets = buscarPetsComCriterios("listar");
 
         if (listaDePets == null || listaDePets.isEmpty()) {
             System.out.println("Nenhum pet encontrado com os critérios informados.");
             return;
         }
 
-        for (PetsModel pet : listaDePets) {
-            System.out.printf("Nome: %s | Tipo: %s | Sexo: %s | Idade: %.1f | Peso: %.1f | Raça: %s | Endereço: %s%n",
-                    pet.getName(),
-                    pet.getTipo(),
-                    pet.getSexo(),
-                    pet.getIdade(),
-                    pet.getPeso(),
-                    pet.getRaca(),
-                    pet.getEndereco()
-            );
-        }
+        listarPets(listaDePets);
     }
-    private PetsRecordsDto obterNovosDadosDoPet(PetsModel pet) {
+
+    private PetDto obterNovosDadosDoPet(Pet pet) {
         System.out.printf("Nome atual: %s. Digite o novo nome (ou pressione Enter para manter):%n", pet.getName());
         String name = SCANNER.nextLine().trim();
         if (name.isEmpty()) {
@@ -292,9 +255,10 @@ public class PetsService {
             raca = pet.getRaca();
         }
 
-        return new PetsRecordsDto(name, pet.getTipo(), pet.getSexo(), endereco, idade, peso, raca);
+        return new PetDto(name, pet.getTipo(), pet.getSexo(), endereco, idade, peso, raca);
     }
-    private List<PetsModel> buscarPetsComCriterios(String acao) {
+
+    private List<Pet> buscarPetsComCriterios(String acao) {
         System.out.printf("Qual o tipo do animal para %s?%n", acao);
         System.out.println("1. Cachorro");
         System.out.println("2. Gato");
@@ -312,8 +276,72 @@ public class PetsService {
             preencherCriterio(Integer.parseInt(SCANNER.nextLine()), filtro);
         }
 
-        return petsControllers.buscarPetsCriterio(tipo, filtro.nome, filtro.sexo, filtro.idade, filtro.peso, filtro.raca, filtro.endereco).getBody();
+        return petsControllers.listPetByCriterio(tipo, filtro.nome, filtro.sexo, filtro.idade, filtro.peso, filtro.raca, filtro.endereco).getBody();
     }
 
+    public List<Pet> buscarPets(Tipo tipo, String nome, String sexo, Float idade, Float peso, String raca, String endereco) {
+        return petsRepository.findAll().stream()
+                .filter(p -> p.getTipo().equals(tipo))
+                .filter(p -> nome == null || p.getName().toLowerCase().contains(nome.toLowerCase()))
+                .filter(p -> sexo == null || p.getSexo().name().equalsIgnoreCase(sexo))
+                .filter(p -> idade == null || p.getIdade().equals(idade))
+                .filter(p -> peso == null || p.getPeso().equals(peso))
+                .filter(p -> raca == null || p.getRaca().toLowerCase().contains(raca.toLowerCase()))
+                .filter(p -> endereco == null || p.getEndereco().toLowerCase().contains(endereco.toLowerCase()))
+                .collect(Collectors.toList());
+    }
 
+    public void listarPetsIterando(List<Pet> listaDePets) {
+        for (int i = 0; i < listaDePets.size(); i++) {
+            Pet pet = listaDePets.get(i);
+            System.out.printf("%d. Nome: %s | Tipo: %s | Sexo: %s | Idade: %.1f | Peso: %.1f | Raça: %s | Endereço: %s%n",
+                    i + 1,
+                    pet.getName(),
+                    pet.getTipo(),
+                    pet.getSexo(),
+                    pet.getIdade(),
+                    pet.getPeso(),
+                    pet.getRaca(),
+                    pet.getEndereco()
+            );
+        }
+    }
+
+    public void listarPets(List<Pet> listaDePets){
+        for (Pet pet : listaDePets) {
+            System.out.printf("Nome: %s | Tipo: %s | Sexo: %s | Idade: %.1f | Peso: %.1f | Raça: %s | Endereço: %s%n",
+                    pet.getName(),
+                    pet.getTipo(),
+                    pet.getSexo(),
+                    pet.getIdade(),
+                    pet.getPeso(),
+                    pet.getRaca(),
+                    pet.getEndereco()
+            );
+        }
+    }
+
+    public void save(PetDto petDto){
+        Pet pet = new Pet(petDto);
+        petsRepository.save(pet);
+    }
+    public List<Pet> listarTodosPets(){
+        return petsRepository.findAll();
+    }
+    public Pet listarPetPorId(Long id){
+        Optional<Pet> petO = petsRepository.findById(id);
+        if (petO.isEmpty()){
+            throw new ValidacaoException("Pet not found.");
+        }
+        return petO.get();
+    }
+    public Pet atualizarPetPorId(Long id, PetDto petDto){
+        Pet pet = listarPetPorId(id);
+        BeanUtils.copyProperties(petDto, pet, "id");
+        return petsRepository.save(pet);
+
+    }
+    public void deltarPetPorId(Long id){
+        petsRepository.deleteById(id);
+    }
 }
