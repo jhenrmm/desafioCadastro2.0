@@ -1,34 +1,51 @@
 package com.example.desafioCadastro2.models;
 
 
+import com.example.desafioCadastro2.dtos.PetDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 
 import java.io.Serializable;
 import java.util.UUID;
 
+@Getter
 @Entity
 @Table(name = "PETS_CADASTRADOS")
-public class PetsModel implements Serializable {
+public class Pet implements Serializable {
+
     private static final long serialVersionUID = 1L;
-    @Getter
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
-    @Getter
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String name;
-    @Getter
+
     private Tipo tipo;
-    @Getter
+
     private Sexo sexo;
-    @Getter
+
     private String endereco;
+
     private float idade;
+
     private float peso;
-    @Getter
+
     private String raca;
 
-    public void setId(UUID id) {
+    public Pet(){}
+
+    public Pet(PetDto dto){
+        this.name = dto.name();
+        this.tipo = dto.tipo();
+        this.sexo = dto.sexo();
+        this.endereco = dto.endereco();
+        this.idade = dto.idade();
+        this.peso = dto.peso();
+        this.raca = dto.raca();
+    }
+
+    public void setId(Long id) {
         this.id = id;
     }
 
