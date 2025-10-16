@@ -1,8 +1,7 @@
 package com.example.desafioCadastro2.service;
 
 import com.example.desafioCadastro2.controllers.PetsControllers;
-import com.example.desafioCadastro2.dtos.PetsRecordsDto;
-import com.example.desafioCadastro2.models.PetsModel;
+import com.example.desafioCadastro2.models.Pet;
 import com.example.desafioCadastro2.models.Tipo;
 import com.example.desafioCadastro2.models.Sexo;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,7 +32,7 @@ class PetsServiceTest {
 
     @Test
     void testListaPetsCadastrados() {
-        PetsModel pet = new PetsModel();
+        Pet pet = new Pet();
         pet.setName("Buddy Silva");
         pet.setTipo(Tipo.CACHORRO);
         pet.setSexo(Sexo.MACHO);
@@ -42,23 +41,23 @@ class PetsServiceTest {
         pet.setRaca("Labrador Retriever");
         pet.setEndereco("Rua das Flores, 123, São Paulo");
 
-        List<PetsModel> petsList = List.of(pet);
-        ResponseEntity<List<PetsModel>> response = ResponseEntity.ok(petsList);
+        List<Pet> petsList = List.of(pet);
+        ResponseEntity<List<Pet>> response = ResponseEntity.ok(petsList);
 
-        when(petsControllers.getAllPets()).thenReturn(response); // <-- mock correto
+        when(petsControllers.listAllPets()).thenReturn(response); // <-- mock correto
 
         assertDoesNotThrow(() -> petsService.listaPetsCadastrados());
 
-        verify(petsControllers, times(1)).getAllPets();
+        verify(petsControllers, times(1)).listAllPets();
     }
 
     @Test
     void testListaPetsCadastrados_Vazio() {
-        when(petsControllers.getAllPets()).thenReturn(ResponseEntity.ok(List.of()));
+        when(petsControllers.listAllPets()).thenReturn(ResponseEntity.ok(List.of()));
 
         assertDoesNotThrow(() -> petsService.listaPetsCadastrados());
 
-        verify(petsControllers, times(1)).getAllPets();
+        verify(petsControllers, times(1)).listAllPets();
     }
 
 }
