@@ -1,6 +1,8 @@
 package com.example.desafioCadastro2.models;
 
 
+import com.example.desafioCadastro2.dtos.DadosAtualizacaoPets;
+import com.example.desafioCadastro2.dtos.DadosListagemPets;
 import com.example.desafioCadastro2.dtos.PetDto;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -38,6 +40,14 @@ public class Pet implements Serializable {
 
     public Pet(){}
 
+    public Pet(DadosAtualizacaoPets attPetDto){
+        this.name = attPetDto.name();
+        this.endereco = attPetDto.endereco();
+        this.idade = attPetDto.idade();
+        this.peso = attPetDto.peso();
+        this.raca = attPetDto.raca();
+    }
+
     public Pet(PetDto dto){
         this.name = dto.name();
         this.tipo = dto.tipo();
@@ -46,6 +56,22 @@ public class Pet implements Serializable {
         this.idade = dto.idade();
         this.peso = dto.peso();
         this.raca = dto.raca();
+    }
+
+    public Pet(String name, Tipo tipo, Sexo sexo, String endereco, Float idade, Float peso, String raca) {
+        this.name = name;
+        this.tipo = tipo;
+        this.sexo = sexo;
+        this.endereco = endereco;
+        this.idade = idade;
+        this.peso = peso;
+        this.raca = raca;
+    }
+
+    public Pet(DadosListagemPets dto) {
+        this.name = dto.name();
+        this.tipo = dto.tipo();
+        this.sexo = dto.sexo();
     }
 
     @Override
