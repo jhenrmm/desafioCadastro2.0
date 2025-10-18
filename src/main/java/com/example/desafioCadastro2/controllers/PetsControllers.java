@@ -1,5 +1,7 @@
 package com.example.desafioCadastro2.controllers;
 
+import com.example.desafioCadastro2.dtos.DadosAtualizacaoPets;
+import com.example.desafioCadastro2.dtos.DadosListagemPets;
 import com.example.desafioCadastro2.dtos.PetDto;
 import com.example.desafioCadastro2.models.Pet;
 import com.example.desafioCadastro2.models.Tipo;
@@ -23,19 +25,19 @@ public class PetsControllers {
     }
 
     @GetMapping("/pets")
-    public ResponseEntity<List<Pet>> listAllPets(){
-        List<Pet> petsList = petsService.listarTodosPets();
+    public ResponseEntity<List<DadosListagemPets>> listAllPets(){
+        List<DadosListagemPets> petsList = petsService.listarTodosPets();
         return ResponseEntity.status(HttpStatus.OK).body(petsList);
     }
 
     @GetMapping("/pets/{id}")
-    public ResponseEntity<Object> listPetById(@PathVariable(value = "id") Long id){
+    public ResponseEntity<Pet> listPetById(@PathVariable(value = "id") Long id){
         Pet pet = petsService.listarPetPorId(id);
         return ResponseEntity.status(HttpStatus.OK).body(pet);
     }
 
     @GetMapping("/petsCriterio")
-    public ResponseEntity<List<Pet>> listPetByCriterio(
+    public ResponseEntity<List<DadosListagemPets>> listPetByCriterio(
             @RequestParam Tipo tipo,
             @RequestParam(required = false) String nome,
             @RequestParam(required = false) String sexo,
@@ -44,19 +46,19 @@ public class PetsControllers {
             @RequestParam(required = false) String raca,
             @RequestParam(required = false) String endereco
     ) {
-        List<Pet> pets = petsService.buscarPets(tipo, nome, sexo, idade, peso, raca, endereco);
+        List<DadosListagemPets> pets = petsService.buscarPets(tipo, nome, sexo, idade, peso, raca, endereco);
         return ResponseEntity.status(HttpStatus.OK).body(pets);
     }
 
     @PutMapping("/pets/{id}")
-    public ResponseEntity<Object> updatePetById(@PathVariable(value = "id") Long id, PetDto petDto){
-        Pet pet = petsService.atualizarPetPorId(id, petDto);
+    public ResponseEntity<Object> updatePetById(@PathVariable(value = "id") Long id, DadosAtualizacaoPets dto){
+        Pet pet = petsService.atualizarPetPorId(id, dto);
         return ResponseEntity.status(HttpStatus.OK).body(pet);
     }
 
     @DeleteMapping("/pets/{id}")
     public ResponseEntity<Object> deletePet(@PathVariable(value = "id") Long id){
-        petsService.deltarPetPorId(id);
+        petsService.deletarPetPorId(id);
         return ResponseEntity.noContent().build();
     }
 
