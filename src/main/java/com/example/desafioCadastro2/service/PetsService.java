@@ -208,8 +208,9 @@ public class PetsService {
     }
 
     public void listaPetsCadastrados(){
-        List<Pet> pets = listarTodosPets();
-        listarPets(pets);
+        List<DadosListagemPets> petsDto = listarTodosPets();
+        List<Pet> listaPets = petsDto.stream().map(Pet::new).toList();
+        listarPets(listaPets);
     }
 
     public void listarPetsPorCriterio(){
@@ -325,8 +326,8 @@ public class PetsService {
         Pet pet = new Pet(petDto);
         petsRepository.save(pet);
     }
-    public List<Pet> listarTodosPets(){
-        return petsRepository.findAll();
+    public List<DadosListagemPets> listarTodosPets(){
+        return petsRepository.findAll().stream().map(DadosListagemPets::new).toList();
     }
     public Pet listarPetPorId(Long id){
         Optional<Pet> petO = petsRepository.findById(id);
@@ -337,7 +338,11 @@ public class PetsService {
     }
     public Pet atualizarPetPorId(Long id, DadosAtualizacaoPets dto){
         Pet pet = listarPetPorId(id);
-        BeanUtils.copyProperties(dto, pet, "id");
+        pet.setName(dto.name());
+        pet.setEndereco(dto.endereco());
+        pet.setIdade(dto.idade());
+        pet.setPeso(dto.peso());
+        pet.setRaca(dto.raca());
         return petsRepository.save(pet);
 
     }
