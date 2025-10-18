@@ -11,7 +11,6 @@ import com.example.desafioCadastro2.models.Tipo;
 import com.example.desafioCadastro2.repositories.PetsRepository;
 import com.example.desafioCadastro2.validations.ValidacaoException;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -281,7 +280,7 @@ public class PetsService {
 
     public List<DadosListagemPets> buscarPets(Tipo tipo, String nome, String sexo, Float idade, Float peso, String raca, String endereco) {
         return petsRepository.findAll().stream()
-                .filter(p -> p.getTipo().equals(tipo))
+                .filter(p -> p.getTipo() == tipo)
                 .filter(p -> nome == null || p.getName().toLowerCase().contains(nome.toLowerCase()))
                 .filter(p -> sexo == null || p.getSexo().name().equalsIgnoreCase(sexo))
                 .filter(p -> idade == null || p.getIdade().equals(idade))
